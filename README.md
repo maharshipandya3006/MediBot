@@ -1,4 +1,4 @@
-# 🩺MediBot- Medical Chatbot
+# 🩺 MediBot- Medical Chatbot
 **RAG based Clinical Reference Assistant**
 
 A Retrieval-Augmented Generation (RAG) powered medical chatbot that provides context aware, source grounded answers from a curated medical knowledge base(in this case : **The 3rd edition of The Gale Encyclopedia of Medicine**).
