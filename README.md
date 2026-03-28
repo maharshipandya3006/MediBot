@@ -5,15 +5,14 @@ A Retrieval-Augmented Generation (RAG) powered medical chatbot that provides con
 
 Instead of relying purely on LLM memory (which can hallucinate), this system retrieves relevant information from trusted documents using FAISS vector search, ensuring accurate and explainable responses.
 
-
-<img width="2560" height="1664" alt="image" src="https://github.com/user-attachments/assets/a95adfe8-f316-4026-a32b-097090897f12" />
+<img width="2940" height="1912" alt="image" src="https://github.com/user-attachments/assets/92a5931c-c58f-4aa3-b65e-1eafbad49c56" />
 <img width="2560" height="1664" alt="image" src="https://github.com/user-attachments/assets/267ab058-67cf-49c8-83e3-4c33d7576112" />
 <img width="2560" height="1664" alt="image" src="https://github.com/user-attachments/assets/db1644f1-a8f0-434d-8b82-929e7a972546" />
 
 # ✨ Key Features
 FAISS vector store for fast semantic retrieval
 
-SentenceTransformer embeddings (all-MiniLM-L6-v2) – switchable to remote API mode
+SentenceTransformer embeddings (all-MiniLM-L6-v2) 
 
 Modular prompt template injection
 
