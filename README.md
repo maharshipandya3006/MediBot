@@ -5,6 +5,8 @@ A Retrieval-Augmented Generation (RAG) powered medical chatbot that provides con
 
 Instead of relying purely on LLM memory (which can hallucinate), this system retrieves relevant information from trusted documents using FAISS vector search, ensuring accurate and explainable responses.
 
+The project is deployed: https://medibot3006.streamlit.app/
+
 # ✨ Key Features
 FAISS vector store for fast semantic retrieval
 
