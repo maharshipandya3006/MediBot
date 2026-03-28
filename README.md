@@ -5,10 +5,6 @@ A Retrieval-Augmented Generation (RAG) powered medical chatbot that provides con
 
 Instead of relying purely on LLM memory (which can hallucinate), this system retrieves relevant information from trusted documents using FAISS vector search, ensuring accurate and explainable responses.
 
-<img width="2940" height="1912" alt="image" src="https://github.com/user-attachments/assets/92a5931c-c58f-4aa3-b65e-1eafbad49c56" />
-<img width="2560" height="1664" alt="image" src="https://github.com/user-attachments/assets/267ab058-67cf-49c8-83e3-4c33d7576112" />
-<img width="2560" height="1664" alt="image" src="https://github.com/user-attachments/assets/db1644f1-a8f0-434d-8b82-929e7a972546" />
-
 # ✨ Key Features
 FAISS vector store for fast semantic retrieval
 
@@ -57,3 +53,10 @@ User Query --> Retriever (top-k) ---------------┘
 | `medibot.py`                | Streamlit chatbot UI using Groq LLM + FAISS retrieval                |
 | `vectorstore/db_faiss`      | Persisted FAISS vector store (precomputed embeddings)                |
 | `data/`                     | Source medical PDF documents                                         |
+
+
+
+## Outpu
+<img width="2940" height="1912" alt="image" src="https://github.com/user-attachments/assets/92a5931c-c58f-4aa3-b65e-1eafbad49c56" />
+<img width="2560" height="1664" alt="image" src="https://github.com/user-attachments/assets/267ab058-67cf-49c8-83e3-4c33d7576112" />
+<img width="2560" height="1664" alt="image" src="https://github.com/user-attachments/assets/db1644f1-a8f0-434d-8b82-929e7a972546" />
