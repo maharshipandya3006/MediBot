@@ -24,10 +24,16 @@ Caching of vector store + embeddings via Streamlit resource cache
 
 # ⚙️ Tech Stack
 Frontend: Streamlit
+
+
 Backend: Python + LangChain
+
 LLM Layer: Groq (LLaMA Model via Groq API)
+
 Embedding Model: HuggingFace SentenceTransformers (all-MiniLM-L6-v2)
+
 Vector DB: FAISS
+
 Data Source: Medical PDFs (via PyPDFLoader)
 
 # 🏗 Architecture
