@@ -56,7 +56,7 @@ User Query --> Retriever (top-k) ---------------┘
 
 
 
-## Outpu
+## 🎯Output
 <img width="2940" height="1912" alt="image" src="https://github.com/user-attachments/assets/92a5931c-c58f-4aa3-b65e-1eafbad49c56" />
 <img width="2560" height="1664" alt="image" src="https://github.com/user-attachments/assets/267ab058-67cf-49c8-83e3-4c33d7576112" />
 <img width="2560" height="1664" alt="image" src="https://github.com/user-attachments/assets/db1644f1-a8f0-434d-8b82-929e7a972546" />
