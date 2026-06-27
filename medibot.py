@@ -1,75 +1,94 @@
 import os
-import streamlit as st
+
+from fastapi import FastAPI
+from pydantic import BaseModel
+from dotenv import load_dotenv
 
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_core.prompts import PromptTemplate
 from langchain_groq import ChatGroq
-from langchain import hub
 from langchain.chains import create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
 
-## Uncomment the following files if you're not using pipenv as your virtual environment manager
-from dotenv import load_dotenv
-
 load_dotenv()
+
+app = FastAPI()
 
 DB_FAISS_PATH = "vectorstore/db_faiss"
 
-@st.cache_resource
+
+class QuestionRequest(BaseModel):
+    question: str
+
+
 def get_vectorstore():
-    embedding_model = HuggingFaceEmbeddings(model_name='sentence-transformers/all-MiniLM-L6-v2')
-    db = FAISS.load_local(DB_FAISS_PATH, embedding_model, allow_dangerous_deserialization=True)
+    embedding_model = HuggingFaceEmbeddings(
+        model_name="sentence-transformers/all-MiniLM-L6-v2"
+    )
+
+    db = FAISS.load_local(
+        DB_FAISS_PATH,
+        embedding_model,
+        allow_dangerous_deserialization=True
+    )
+
     return db
 
-def set_custom_prompt(custom_prompt_template):
-    prompt = PromptTemplate(template=custom_prompt_template, input_variables=["context", "question"])
-    return prompt
 
-def main():
-    st.title("Ask MediBot!")
+def get_rag_chain():
+    vectorstore = get_vectorstore()
 
-    if 'messages' not in st.session_state:
-        st.session_state.messages = []
+    groq_api_key = os.environ.get("GROQ_API_KEY")
+    groq_model_name = os.environ.get("GROQ_MODEL_NAME", "openai/gpt-oss-20b")
 
-    for message in st.session_state.messages:
-        st.chat_message(message['role']).markdown(message['content'])
+    llm = ChatGroq(
+        model=groq_model_name,
+        temperature=0.5,
+        max_tokens=512,
+        api_key=groq_api_key,
+    )
 
-    prompt = st.chat_input("Pass your prompt here")
+    prompt = PromptTemplate(
+        template="""
+Use the given context to answer the user's medical question.
+If you do not know the answer, say that you do not know.
+Do not make up medical information.
 
-    if prompt:
-        st.chat_message('user').markdown(prompt)
-        st.session_state.messages.append({'role': 'user', 'content': prompt})
+Context:
+{context}
 
-        try:
-            vectorstore = get_vectorstore()
-            if vectorstore is None:
-                st.error("Failed to load the vector store")
+Question:
+{input}
 
-            GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
-            GROQ_MODEL_NAME = "openai/gpt-oss-20b"
-            llm = ChatGroq(
-                model=GROQ_MODEL_NAME,
-                temperature=0.5,
-                max_tokens=512,
-                api_key=GROQ_API_KEY,
-            )
+Answer:
+""",
+        input_variables=["context", "input"],
+    )
 
-            retrieval_qa_chat_prompt = hub.pull("langchain-ai/retrieval-qa-chat")
+    combine_docs_chain = create_stuff_documents_chain(llm, prompt)
 
-            combine_docs_chain = create_stuff_documents_chain(llm, retrieval_qa_chat_prompt)
+    rag_chain = create_retrieval_chain(
+        vectorstore.as_retriever(search_kwargs={"k": 6}),
+        combine_docs_chain
+    )
 
-            rag_chain = create_retrieval_chain(vectorstore.as_retriever(search_kwargs={'k': 6}), combine_docs_chain)
-
-            response = rag_chain.invoke({'input': prompt})
-
-            result = response["answer"]
-            st.chat_message('assistant').markdown(result)
-            st.session_state.messages.append({'role': 'assistant', 'content': result})
-
-        except Exception as e:
-            st.error(f"Error: {str(e)}")
+    return rag_chain
 
 
-if __name__ == "__main__":
-    main()
+@app.get("/")
+def home():
+    return {
+        "message": "MediBot API is running. Use POST /ask to ask a question."
+    }
+
+
+@app.post("/ask")
+def ask_question(request: QuestionRequest):
+    rag_chain = get_rag_chain()
+    response = rag_chain.invoke({"input": request.question})
+
+    return {
+        "question": request.question,
+        "answer": response["answer"]
+    }
