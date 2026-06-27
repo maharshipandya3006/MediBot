@@ -1,3 +1,9 @@
+---
+title: MediBot
+sdk: docker
+app_port: 7860
+---
+
 # MediBot: RAG Based Medical Reference Assistant
 
 MediBot is a Retrieval Augmented Generation (RAG) based medical reference
@@ -95,6 +101,7 @@ interface, while the backend performs retrieval and generation invisibly.
 ### Deployment
 
 - Render Web Service
+- Hugging Face Spaces with Docker
 - `render.yaml` infrastructure configuration
 - Health checks via `/health`
 - Runtime environment variables for secrets and model selection
@@ -407,6 +414,60 @@ vectorstore/db_faiss/index.pkl
 Security note: LangChain FAISS persistence stores document metadata using
 pickle. This app enables FAISS deserialization because it loads its own trusted
 local vector store. Do not load a FAISS index from an untrusted source.
+
+## Hugging Face Spaces Deployment
+
+This project includes Docker support for Hugging Face Spaces.
+
+Recommended Space settings:
+
+```text
+SDK: Docker
+Hardware: CPU Basic
+Visibility: Public or Private
+App Port: 7860
+```
+
+Required Space secrets:
+
+```text
+GROQ_API_KEY=your_groq_api_key_here
+GROQ_MODEL_NAME=openai/gpt-oss-20b
+HF_TOKEN=your_huggingface_token_here
+```
+
+The Docker container starts FastAPI with:
+
+```bash
+uvicorn app:app --host 0.0.0.0 --port 7860
+```
+
+The root Space URL should open the MediBot chat UI. The health endpoint remains:
+
+```text
+/health
+```
+
+## Render Deployment
+
+This repository also includes `render.yaml` for Render Web Services.
+
+Render settings:
+
+```text
+Runtime: Python
+Build Command: pip install -r requirements.txt
+Start Command: uvicorn app:app --host 0.0.0.0 --port $PORT
+Health Check Path: /health
+```
+
+Required Render environment variables:
+
+```text
+GROQ_API_KEY=your_groq_api_key_here
+GROQ_MODEL_NAME=openai/gpt-oss-20b
+PYTHON_VERSION=3.13.2
+```
 
 ## Requirements
 
