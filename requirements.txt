@@ -1,47 +1,38 @@
-# Environment variables
 python-dotenv==1.1.1
 
-# Vercel API
 fastapi==0.116.1
 uvicorn==0.35.0
 pydantic==2.11.7
 
-# LangChain
 langchain==0.3.26
 langchain-community==0.3.27
 langchain-core==0.3.68
 langchain-groq==0.3.5
 langchain-huggingface==0.3.0
 langchain-text-splitters==0.3.8
+langsmith==0.4.4
 
-# Groq
 groq==0.29.0
 
-# Vector database
 faiss-cpu==1.11.0
 
-# Embeddings and ML
 sentence-transformers==5.0.0
 transformers==4.53.1
 torch==2.7.1
 huggingface-hub==0.33.2
 safetensors==0.5.3
 
-# PDF loading for create_memory_for_llm.py
 pypdf==5.7.0
 
-# Core data dependencies
 numpy==2.3.1
 scikit-learn==1.7.0
 scipy==1.16.0
 pandas==2.3.1
 
-# HTTP dependencies
 requests==2.32.4
 httpx==0.28.1
 aiohttp==3.12.14
 
-# Utilities
 tqdm==4.67.1
 typing-extensions==4.14.1
 tenacity==9.1.2

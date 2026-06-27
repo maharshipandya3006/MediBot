@@ -31,9 +31,7 @@ def get_embedding_model():
 
 def load_vectorstore():
     if not DB_FAISS_PATH.exists():
-        raise FileNotFoundError(
-            "FAISS database not found at vectorstore/db_faiss."
-        )
+        raise FileNotFoundError("FAISS database not found at vectorstore/db_faiss.")
 
     embedding_model = get_embedding_model()
 
@@ -60,7 +58,7 @@ def create_rag_chain():
 
     vectorstore = load_vectorstore()
 
-    custom_prompt = PromptTemplate(
+    prompt = PromptTemplate(
         template="""
 You are MediBot,a helpful medical assistant.
 Use only the provided context to answer the user's question.
@@ -79,7 +77,7 @@ Answer:
         input_variables=["context", "input"],
     )
 
-    combine_docs_chain = create_stuff_documents_chain(llm, custom_prompt)
+    combine_docs_chain = create_stuff_documents_chain(llm, prompt)
 
     return create_retrieval_chain(
         vectorstore.as_retriever(search_kwargs={"k": 3}),
@@ -96,15 +94,17 @@ def home():
 
 @app.post("/ask")
 def ask_question(request: QuestionRequest):
-    if not request.question.strip():
+    question = request.question.strip()
+
+    if not question:
         raise HTTPException(status_code=400, detail="Question cannot be empty.")
 
     try:
         rag_chain = create_rag_chain()
-        response = rag_chain.invoke({"input": request.question})
+        response = rag_chain.invoke({"input": question})
 
         return {
-            "question": request.question,
+            "question": question,
             "answer": response["answer"],
         }
 
