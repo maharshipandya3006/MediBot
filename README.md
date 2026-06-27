@@ -26,7 +26,7 @@ Frontend: Streamlit
 
 Backend: Python + LangChain
 
-LLM Layer: Groq (LLaMA Model via Groq API)
+LLM Layer: Groq (openai/gpt-oss-20b model via Groq API)
 
 Embedding Model: HuggingFace SentenceTransformers (all-MiniLM-L6-v2)
 
