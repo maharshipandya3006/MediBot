@@ -13,7 +13,7 @@ load_dotenv()
 
 # Step 1: Setup Groq LLM
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
-GROQ_MODEL_NAME = "llama-3.1-8b-instant"
+GROQ_MODEL_NAME = "openai/gpt-oss-20b"
 
 
 llm = ChatGroq(
