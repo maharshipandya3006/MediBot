@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MediBot</title>
+    <meta
+      name="description"
+      content="MediBot is a source-grounded medical reference assistant."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg" />
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="side-panel" aria-label="MediBot context">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">
+            <span></span>
+          </div>
+          <div>
+            <p class="eyebrow">Medical Assistant</p>
+            <h1>MediBot</h1>
+          </div>
+        </div>
+
+        <section class="status-panel" aria-label="Service status">
+          <div>
+            <span class="status-dot" id="statusDot"></span>
+            <span id="statusText">Checking service</span>
+          </div>
+          <p id="modelText">Model unavailable</p>
+        </section>
+
+        <p class="safety-note">
+          Educational reference only. For urgent symptoms or personal medical
+          decisions, contact a qualified clinician or emergency services.
+        </p>
+      </aside>
+
+      <main class="chat-panel">
+        <header class="chat-header">
+          <div class="header-actions">
+            <button class="new-chat-button" id="newChatButton" type="button">
+              New Chat
+            </button>
+          </div>
+        </header>
+
+        <section class="messages" id="messages" aria-live="polite">
+          <article class="message assistant">
+            <div class="avatar">MB</div>
+            <div class="bubble">
+              <p>
+                Hello, I am Medibot! Feel free to ask me any medical related query :)
+              </p>
+            </div>
+          </article>
+        </section>
+
+        <form class="composer" id="chatForm">
+          <label class="sr-only" for="questionInput">Medical question</label>
+          <textarea
+            id="questionInput"
+            name="question"
+            rows="1"
+            maxlength="1200"
+            placeholder="Ask about symptoms, conditions, or medical terms..."
+            required
+          ></textarea>
+          <button type="submit" id="sendButton" aria-label="Send question">
+            <span>Send</span>
+            <svg aria-hidden="true" viewBox="0 0 24 24">
+              <path d="M3.4 20.4 21 12 3.4 3.6 3 10.2l10.5 1.8L3 13.8l.4 6.6Z" />
+            </svg>
+          </button>
+        </form>
+      </main>
+    </div>
+
+    <script src="/static/app.js"></script>
+  </body>
+</html>

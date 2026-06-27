@@ -1,64 +1,155 @@
-# 🩺 MediBot- Medical Chatbot
-**RAG based Clinical Reference Assistant**
+# MediBot
 
-A Retrieval-Augmented Generation (RAG) powered medical chatbot that provides context aware, source grounded answers from a curated medical knowledge base(in this case : **The 3rd edition of The Gale Encyclopedia of Medicine**).
+MediBot is a full-stack medical reference assistant built with FastAPI, LangChain,
+Groq, HuggingFace embeddings, and FAISS. The deployed Render URL opens a clean
+chat interface, while the API remains available for integrations.
 
-Instead of relying purely on LLM memory (which can hallucinate), this system retrieves relevant information from trusted documents using FAISS vector search, ensuring accurate and explainable responses.
+The assistant answers from a local medical reference index and returns source
+snippets so users can see which retrieved context supported the response.
 
-The project is deployed: 
+## What Is Included
 
-# ✨ Key Features
-FAISS vector store for fast semantic retrieval
+- Professional responsive chat UI served by FastAPI
+- `POST /api/ask` endpoint for chatbot questions
+- Legacy `POST /ask` endpoint for existing clients
+- `GET /health` endpoint for uptime checks
+- Cached embedding model, vector store, LLM client, and RAG chain
+- Source snippets in every successful chatbot response
+- Medical safety-oriented system prompt
+- FAISS index generated from `data/` PDFs
 
-SentenceTransformer embeddings (all-MiniLM-L6-v2) 
+## Project Structure
 
-Modular prompt template injection
+```text
+.
+|-- app.py                       # FastAPI app, static UI, API routes, RAG chain
+|-- create_memory_for_llm.py      # Builds vectorstore/db_faiss from PDFs
+|-- connect_memory_with_llm.py    # CLI querying helper
+|-- static/
+|   |-- index.html                # Chat UI
+|   |-- styles.css                # Responsive visual system
+|   |-- app.js                    # Frontend API integration
+|   `-- favicon.svg               # Browser tab icon
+|-- data/                         # Source medical PDF files
+|-- vectorstore/db_faiss/         # Persisted FAISS index
+|-- requirements.txt
+|-- render.yaml
+`-- .env.example
+```
 
-Groq LLM backends
+## Local Setup
 
-Source document traceability (shows which chunks supported the answer)
+Use Python 3.13.2.
 
-Caching of vector store + embeddings via Streamlit resource cache
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env
+```
 
-# ⚙️ Tech Stack
-Frontend: Streamlit
+Set your Groq key in `.env`:
 
+```text
+GROQ_API_KEY=your_groq_api_key_here
+GROQ_MODEL_NAME=openai/gpt-oss-20b
+```
 
-Backend: Python + LangChain
+Start the app:
 
-LLM Layer: Groq (openai/gpt-oss-20b model via Groq API)
+```bash
+uvicorn app:app --reload
+```
 
-Embedding Model: HuggingFace SentenceTransformers (all-MiniLM-L6-v2)
+Open:
 
-Vector DB: FAISS
+```text
+http://127.0.0.1:8000
+```
 
-Data Source: Medical PDFs (via PyPDFLoader)
+## Rebuild The Vector Store
 
-# 🏗 Architecture
+If you change PDFs inside `data/`, rebuild the FAISS index:
 
-PDF(s) --> Text Splitter --> Embeddings(Hugging Face) --> FAISS Index (vectorstore/db_faiss)
-								│
-User Query --> Retriever (top-k) ---------------┘
-			    │
-		    Prompt Assembly
-			    │
-		    LLM Generation (Groq)
-			    │
-		    Answer + Source Chunks
+```bash
+python create_memory_for_llm.py
+```
 
-## 📂 Main Components
+This creates or updates:
 
-| File/Directory               | Role                                                                 |
-|-----------------------------|----------------------------------------------------------------------|
-| `create_memory_for_llm.py`  | Builds FAISS index from PDFs (embedding + persistence)               |
-| `connect_memory_with_llm.py`| CLI-based RAG querying using HuggingFace Endpoint                    |
-| `medibot.py`                | Streamlit chatbot UI using Groq LLM + FAISS retrieval                |
-| `vectorstore/db_faiss`      | Persisted FAISS vector store (precomputed embeddings)                |
-| `data/`                     | Source medical PDF documents                                         |
+```text
+vectorstore/db_faiss/index.faiss
+vectorstore/db_faiss/index.pkl
+```
 
+Only load FAISS stores that you trust. LangChain FAISS persistence uses pickle
+metadata and the app must enable deserialization to restore the docstore.
 
+## API
 
-## 🎯Output
-<img width="2940" height="1912" alt="image" src="https://github.com/user-attachments/assets/872080b4-498e-422e-bb91-913e1a78f44f" />
-<img width="2940" height="1912" alt="image" src="https://github.com/user-attachments/assets/0c9835df-77ed-4bc6-95cf-1913f7718b62" />
-<img width="2940" height="1912" alt="image" src="https://github.com/user-attachments/assets/03c1c8ae-1216-41d0-a3c6-32b8d8968316" />
+Health check:
+
+```http
+GET /health
+```
+
+Ask a question:
+
+```http
+POST /api/ask
+Content-Type: application/json
+
+{
+  "question": "What are common symptoms of asthma?"
+}
+```
+
+Response:
+
+```json
+{
+  "question": "What are common symptoms of asthma?",
+  "answer": "A source-grounded answer...",
+  "sources": [
+    {
+      "source": "The Gale Encyclopedia of Medicine",
+      "page": "123",
+      "preview": "Retrieved source snippet..."
+    }
+  ]
+}
+```
+
+Interactive API docs:
+
+```text
+/docs
+```
+
+## Render Deployment
+
+Create a Render Web Service from this repository.
+
+Recommended settings:
+
+```text
+Runtime: Python
+Build Command: pip install -r requirements.txt
+Start Command: uvicorn app:app --host 0.0.0.0 --port $PORT
+```
+
+Environment variables:
+
+```text
+GROQ_API_KEY=your_groq_api_key_here
+GROQ_MODEL_NAME=openai/gpt-oss-20b
+```
+
+After deployment, your Render root URL opens the MediBot chat UI. The raw API is
+still available at `/api/ask`, `/ask`, `/health`, and `/docs`.
+
+## Medical Safety Note
+
+MediBot is an educational reference assistant, not a diagnostic system. Users
+should consult qualified healthcare professionals for personal medical decisions
+and seek emergency help for urgent symptoms.
