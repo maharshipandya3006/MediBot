@@ -1,8 +1,3 @@
----
-title: MediBot
-sdk: docker
-app_port: 7860
----
 
 # 🩺 MediBot: RAG-Based Medical Reference Assistant
 
