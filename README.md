@@ -4,9 +4,9 @@ sdk: docker
 app_port: 7860
 ---
 
-# MediBot: RAG Based Medical Reference Assistant
+# 🩺 MediBot: RAG-Based Medical Reference Assistant
 
-MediBot is a Retrieval Augmented Generation (RAG) based medical reference
+MediBot is a Retrieval-Augmented Generation (RAG) based medical reference
 assistant. Instead of relying only on a language model's general memory, MediBot
 retrieves relevant passages from a curated medical knowledge base, injects that
 retrieved context into the model prompt, and generates a clean educational
@@ -15,7 +15,9 @@ answer for the user.
 The product is built as a full stack RAG application using FastAPI, LangChain,
 Groq, HuggingFace sentence embeddings, and FAISS. It includes a polished
 browser based chat interface, a local vector database, a medical safety prompt,
-and deployment configuration for Render.
+and deployment configuration for Hugging Face Spaces and Render.
+
+Deployed Project: [https://huggingface.co/spaces/maharshipandya3006/MediBot](https://huggingface.co/spaces/maharshipandya3006/MediBot)
 
 The current knowledge base is built from The Gale Encyclopedia of Medicine. The
 retrieval layer searches this indexed reference corpus for relevant chunks, and
@@ -27,7 +29,7 @@ MediBot is designed as an educational reference assistant. It is not a medical
 diagnosis system, treatment engine, emergency triage system, or substitute for a
 qualified healthcare professional.
 
-## Product Overview
+##  Product Overview
 
 MediBot helps users ask medical reference questions in simple language while the
 system handles retrieval, prompt assembly, answer generation, and response
@@ -46,10 +48,10 @@ Key product behavior:
 - Maintains short conversation context for follow up questions
 - Scopes follow up context to the latest medical topic
 - Provides a New Chat button that clears current chat memory in the browser
-- Includes a health endpoint for Render uptime checks
+- Includes a health endpoint for deployment checks
 - Keeps generated API documentation disabled for a cleaner deployed product
 
-## Why RAG
+##  Why RAG?
 
 Medical reference applications need more control than a plain chatbot. A
 general purpose LLM may answer from broad training data, but MediBot is designed
@@ -67,7 +69,7 @@ RAG improves the product in four important ways:
 The system still keeps the user experience simple. Users see a normal chat
 interface, while the backend performs retrieval and generation invisibly.
 
-## Technology Stack
+##  Technology Stack
 
 ### Backend
 
@@ -106,7 +108,7 @@ interface, while the backend performs retrieval and generation invisibly.
 - Health checks via `/health`
 - Runtime environment variables for secrets and model selection
 
-## Architecture
+##  Architecture
 
 ```mermaid
 flowchart LR
@@ -178,7 +180,7 @@ Question Answering steps:
     references before returning the answer.
 14. The UI displays only the final clean response.
 
-## Retrieval Strategy
+##  Retrieval Strategy
 
 The current retrieval configuration uses:
 
@@ -202,7 +204,7 @@ throat infection -> sore throat tonsillitis pharyngitis throat infection
 This improves retrieval quality when users ask short or informal medical
 questions.
 
-## Context Handling
+##  Context Handling
 
 MediBot uses conversation context carefully. It does not blindly send the entire
 chat history into every RAG call.
@@ -217,7 +219,7 @@ This keeps responses focused. For example, if a user asks about fever and then
 switches to throat infection, a later question like "tell me its treatment" is
 treated as a throat infection follow up, not a fever follow up.
 
-## Repository Structure
+##  Repository Structure
 
 ```text
 .
@@ -231,6 +233,8 @@ treated as a throat infection follow up, not a fever follow up.
 |   |-- app.js                    # Chat behavior, API calls, browser memory
 |   `-- favicon.svg               # Browser tab icon
 |-- vectorstore/db_faiss/         # Persisted FAISS index
+|-- Dockerfile                    # Docker image for Hugging Face Spaces
+|-- .dockerignore                 # Files excluded from Docker builds
 |-- requirements.txt              # Python dependencies
 |-- render.yaml                   # Render deployment configuration
 |-- .python-version               # Python version target
@@ -238,7 +242,7 @@ treated as a throat infection follow up, not a fever follow up.
 `-- README.md
 ```
 
-## Core Files
+##  Core Files
 
 ### `app.py`
 
@@ -274,9 +278,9 @@ browser UI.
 ### `static/`
 
 Contains the full frontend. The app intentionally avoids a framework so the UI
-is simple to deploy with FastAPI and Render.
+is simple to serve directly from FastAPI.
 
-## API Reference
+##  API Reference
 
 Generated FastAPI docs are disabled in production style configuration. The
 supported endpoints are listed here.
@@ -287,7 +291,7 @@ Serves the MediBot chat UI.
 
 ### `GET /health`
 
-Returns service status for Render health checks.
+Returns service status for deployment health checks.
 
 Example response:
 
@@ -339,7 +343,7 @@ intentionally returns an empty list so the UI remains clean and citation free.
 Legacy compatibility endpoint. It accepts the same request and returns the same
 response shape as `/api/ask`.
 
-## Environment Variables
+##  Environment Variables
 
 Create a local `.env` file from `.env.example`.
 
@@ -364,9 +368,10 @@ Notes:
 
 - `.env` must never be committed to Git.
 - `.env.example` is safe to commit because it contains placeholders only.
-- Render should store `GROQ_API_KEY` as a protected environment variable.
+- Hosting providers should store `GROQ_API_KEY` as a protected secret or
+  environment variable.
 
-## Local Development
+##  Local Development
 
 Use Python 3.13.2.
 
@@ -390,7 +395,7 @@ Open:
 http://127.0.0.1:8000
 ```
 
-## Rebuilding The Vector Store
+## ️ Rebuilding The Vector Store
 
 The committed app expects the FAISS index at:
 
@@ -415,61 +420,7 @@ Security note: LangChain FAISS persistence stores document metadata using
 pickle. This app enables FAISS deserialization because it loads its own trusted
 local vector store. Do not load a FAISS index from an untrusted source.
 
-## Hugging Face Spaces Deployment
-
-This project includes Docker support for Hugging Face Spaces.
-
-Recommended Space settings:
-
-```text
-SDK: Docker
-Hardware: CPU Basic
-Visibility: Public or Private
-App Port: 7860
-```
-
-Required Space secrets:
-
-```text
-GROQ_API_KEY=your_groq_api_key_here
-GROQ_MODEL_NAME=openai/gpt-oss-20b
-HF_TOKEN=your_huggingface_token_here
-```
-
-The Docker container starts FastAPI with:
-
-```bash
-uvicorn app:app --host 0.0.0.0 --port 7860
-```
-
-The root Space URL should open the MediBot chat UI. The health endpoint remains:
-
-```text
-/health
-```
-
-## Render Deployment
-
-This repository also includes `render.yaml` for Render Web Services.
-
-Render settings:
-
-```text
-Runtime: Python
-Build Command: pip install -r requirements.txt
-Start Command: uvicorn app:app --host 0.0.0.0 --port $PORT
-Health Check Path: /health
-```
-
-Required Render environment variables:
-
-```text
-GROQ_API_KEY=your_groq_api_key_here
-GROQ_MODEL_NAME=openai/gpt-oss-20b
-PYTHON_VERSION=3.13.2
-```
-
-## Requirements
+##  Requirements
 
 The project uses a broad dependency set because it includes the web server,
 LangChain, Groq, FAISS, HuggingFace embeddings, PDF loading, and ML runtime
@@ -498,7 +449,7 @@ The dependency set has been checked locally in Python 3.13 with:
 python -m pip check
 ```
 
-## Safety And Product Boundaries
+##  Safety And Product Boundaries
 
 MediBot is intentionally conservative. It should:
 
@@ -513,18 +464,8 @@ Emergency examples include severe breathing trouble, chest pain, stroke like
 symptoms, severe allergic reaction, heavy bleeding, fainting, or thoughts of
 self-harm.
 
-## Known Limitations
 
-- The answer quality depends on the available indexed medical reference content.
-- If the FAISS index does not contain relevant information, the app should avoid
-  inventing an answer.
-- The UI stores conversation history in browser `sessionStorage`, not a database.
-- The app does not include authentication or user accounts.
-- The app does not provide real time medical triage.
-- The current API keeps `sources` as an empty list for a cleaner product
-  experience.
-
-## License And Disclaimer
+##  License And Disclaimer
 
 This project is for educational and portfolio use. The medical content and any
 source PDFs used to build the vector store must be used according to their
